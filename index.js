@@ -20,10 +20,11 @@ if (process.env.debug) {
 
 const isNilOrEmpty = R.either(R.isNil, R.isEmpty);
 
-const getHeaders = ({ apiKey }) => ({
+const getHeaders = ({ apiKey, requestId }) => ({
   'X-API-KEY': apiKey,
   'X-API-VERSION': '2020-05-04',
   'Content-Type': 'application/json',
+  ...requestId ? { requestId } : {},
 });
 
 
@@ -83,9 +84,13 @@ class Plugin {
     token: {
       sellerId,
     },
+    requestId,
   }) {
     const url = `${endpoint || this.endpoint}/experiences?seller=${sellerId}`;
-    const headers = getHeaders({ apiKey: this.apiKey });
+    const headers = getHeaders({
+      apiKey: this.apiKey,
+      requestId,
+    });
     try {
       const products = R.path(['data', 'data'], await this.axios({
         method: 'get',
@@ -107,6 +112,7 @@ class Plugin {
       productTypeDefs,
       productQuery,
     },
+    requestId,
   }) {
     let url = `${endpoint || this.endpoint}/experiences?seller=${sellerId}`;
     if (!isNilOrEmpty(payload)) {
@@ -114,7 +120,10 @@ class Plugin {
         url = `${url}/${payload.productId}`;
       }
     }
-    const headers = getHeaders({ apiKey: this.apiKey });
+    const headers = getHeaders({
+      apiKey: this.apiKey,
+      requestId,
+    });
     let results = R.pathOr([], ['data', 'data'], await this.axios({
       method: 'get',
       url,
@@ -175,6 +184,7 @@ class Plugin {
       availTypeDefs,
       availQuery,
     },
+    requestId,
   }) {
     assert(this.jwtKey, 'JWT secret should be set');
     assert(
@@ -189,7 +199,10 @@ class Plugin {
     assert(optionIds.every(Boolean), 'some invalid optionId(s)');
     const localDateStart = moment(startDate, dateFormat).format('YYYY-MM-DD');
     const localDateEnd = moment(endDate, dateFormat).format('YYYY-MM-DD');
-    const headers = getHeaders({ apiKey: this.apiKey });
+    const headers = getHeaders({
+      apiKey: this.apiKey,
+      requestId,
+    });
     const url = `${endpoint || this.endpoint}`;
     let availability = (
       await Promise.map(productIds, async (productId, ix) => {
@@ -272,6 +285,7 @@ class Plugin {
       availTypeDefs,
       availQuery,
     },
+    requestId,
   }) {
     return { availability: [] };
     assert(this.jwtKey, 'JWT secret should be set');
@@ -287,7 +301,10 @@ class Plugin {
     assert(optionIds.every(Boolean), 'some invalid optionId(s)');
     const localDateStart = moment(startDate, dateFormat).format('YYYY-MM-DD');
     const localDateEnd = moment(endDate, dateFormat).format('YYYY-MM-DD');
-    const headers = getHeaders({ apiKey: this.apiKey });
+    const headers = getHeaders({
+      apiKey: this.apiKey,
+      requestId,
+    });
     const url = `${endpoint || this.endpoint}/experiences`;
     const availability = (
       await Promise.map(productIds, async (productId, ix) => {
@@ -331,11 +348,15 @@ class Plugin {
       bookingTypeDefs,
       bookingQuery,
     },
+    requestId,
   }) {
     assert(availabilityKey, 'an availability code is required !');
     assert(R.path(['name'], holder), 'a holder\' first name is required');
     assert(R.path(['surname'], holder), 'a holder\' surname is required');
-    const headers = getHeaders({ apiKey: this.apiKey });
+    const headers = getHeaders({
+      apiKey: this.apiKey,
+      requestId,
+    });
     const urlForCreateBooking = `${endpoint || this.endpoint}/orders`;
     const dataFromAvailKey = await jwt.verify(availabilityKey, this.jwtKey);
     let booking = R.path(['data'], await this.axios({
@@ -403,9 +424,13 @@ class Plugin {
       bookingTypeDefs,
       bookingQuery,
     },
+    requestId,
   }) {
     assert(!isNilOrEmpty(bookingId) || !isNilOrEmpty(id), 'Invalid booking id');
-    const headers = getHeaders({ apiKey: this.apiKey });
+    const headers = getHeaders({
+      apiKey: this.apiKey,
+      requestId,
+    });
     // let booking = R.path(['data'], await this.axios({
     //   method: 'get',
     //   url: `${endpoint || this.endpoint}/orders/${bookingId || id}`,
@@ -451,6 +476,7 @@ class Plugin {
       bookingTypeDefs,
       bookingQuery,
     },
+    requestId,
   }) {
     console.log(token);
     assert(
@@ -460,7 +486,10 @@ class Plugin {
       ),
       'at least one parameter is required',
     );
-    const headers = getHeaders({ apiKey: this.apiKey });
+    const headers = getHeaders({
+      apiKey: this.apiKey,
+      requestId,
+    });
     const searchByUrl = async url => {
       try {
         return R.path(['data', 'data'], await this.axios({
