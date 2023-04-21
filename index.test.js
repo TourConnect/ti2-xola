@@ -35,6 +35,7 @@ const typeDefsAndQueries = {
 };
 
 const app = new Plugin({
+  endpoint: process.env.ti2_xola_endpoint,
   apiKey: process.env.ti2_xola_apiKey,
   jwtKey: process.env.ti2_xola_jwtKey,
 });

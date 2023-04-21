@@ -10,7 +10,7 @@ const { translateAvailability } = require('./resolvers/availability');
 const { translateBooking } = require('./resolvers/booking');
 const { translateRate } = require('./resolvers/rate');
 
-const endpoint = 'https://sandbox.xola.com/api';
+const endpoint = null;
 
 const CONCURRENCY = 3; // is this ok ?
 
