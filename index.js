@@ -23,12 +23,6 @@ const getHeaders = ({ apiKey }) => ({
 });
 
 
-const axiosSafeRequest = R.pick(['headers', 'method', 'url', 'data']);
-const axiosSafeResponse = response => {
-  const retVal = R.pick(['data', 'status', 'statusText', 'headers', 'request'], response);
-  retVal.request = axiosSafeRequest(retVal.request);
-  return retVal;
-};
 class Plugin {
   constructor(params) { // we get the env variables from here
     Object.entries(params).forEach(([attr, value]) => {
@@ -56,9 +50,6 @@ class Plugin {
         description: 'the affiliate code provided from Xola',
       },
     });
-    this.errorPathsAxiosErrors = () => ([ // axios triggered errors
-    ]);
-    this.errorPathsAxiosAny = () => ([]); // 200's that should be errors
   }
 
   async validateToken({
