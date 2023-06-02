@@ -33,20 +33,49 @@ const resolvers = {
       return false;
     },
     editable: () => false,
-    unitItems: ({ items = [] }) => R.pathOr([], [0, 'demographics'], items).map(unitItem => ({
-      unitItemId: R.path(['id'], unitItem),
-      unitId: R.path(['demographic', 'id'], unitItem),
-      unitName: R.pathOr('', ['demographic', 'label'], unitItem),
-    })),
+    unitItems: ({ items = [], allDemographics = [] }) => {
+      return R.pathOr([], [0, 'guests'], items).map(guest => {
+        /*
+        guests: [
+           {
+             id: '647918eb2412645f2330e33d',
+             demographic: {
+               id: '647917e442b33f1e963398a2',
+               quantity: 2,
+               demographic: { id: '643d733e45c0452ed70d1a7e' }
+             },
+             ticketCode: 'd6cnzdd67wg0',
+             guestStatus: 'pending'
+           },
+           {
+             id: '647918eb2412645f2330e33e',
+             demographic: {
+               id: '647917e442b33f1e963398a2',
+               quantity: 2,
+               demographic: { id: '643d733e45c0452ed70d1a7e' }
+             },
+             ticketCode: '4x6qbjirvkw0',
+             guestStatus: 'pending'
+           }
+         ]
+        */
+        const foundDemographic = allDemographics.find(d => d.id === R.path(['demographic', 'demographic', 'id'], guest));
+        return {
+          unitItemId: R.path(['id'], guest),
+          unitId: R.path(['id'], foundDemographic),
+          unitName: R.pathOr('', ['label'], foundDemographic),
+        };
+      });
+    },
     start: R.path(['items', 0, 'arrivalDatetime']),
     allDay: root => !R.path(['items', 0, 'arrivalTime'], root),
     bookingDate: R.path(['createdAt']),
     holder: root => ({
-      name: R.pathOr('', ['organizer', 'name'], root).split(' ')[0],
-      surname: R.pathOr('', ['organizer', 'name'], root).split(' ')[1],
-      fullName: R.path(['organizer', 'name'], root),
-      phoneNumber: R.path(['organizer', 'phone'], root),
-      emailAddress: R.path(['organizer', 'email'], root),
+      name: R.pathOr('', ['customerName'], root).split(' ')[0],
+      surname: R.pathOr('', ['customerName'], root).split(' ')[1],
+      fullName: R.path(['customerName'], root),
+      phoneNumber: R.path(['phone'], root),
+      emailAddress: R.path(['customerEmail'], root),
     }),
     notes: R.pathOr('', ['notes', 0, 'text']),
     price: root => ({

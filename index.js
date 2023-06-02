@@ -57,6 +57,12 @@ class Plugin {
       },
     });
     this.errorPathsAxiosErrors = () => ([ // axios triggered errors
+      ['response', 'data', 'field', 'adjustments', 'message'],
+      obj => {
+        if (R.path(['response', 'data', 'field', 'customerEmail'], obj) === 'required') {
+          return 'Email is required';
+        }
+      }
     ]);
     this.errorPathsAxiosAny = () => ([]); // 200's that should be errors
   }
@@ -456,8 +462,13 @@ class Plugin {
     })();
     return ({
       bookings: await Promise.map(R.flatten(bookings), async booking => {
+        const allDemographics = await R.pathOr([], ['data', 'data'], await axios({
+          url: `${endpoint || this.endpoint}/demographics?seller=${sellerId}&experience=${R.path(['items', 0, 'experience', 'id'], booking)}`,
+          method: 'get',
+          headers,
+        }));
         return translateBooking({
-          rootValue: booking,
+          rootValue: { ...booking, allDemographics },
           typeDefs: bookingTypeDefs,
           query: bookingQuery,
         });
@@ -478,7 +489,7 @@ class Plugin {
     });
     const affiliates = await R.path(['data'], await axios({
       method: 'get',
-      url: `${endpoint || this.endpoint}/users/${sellerId}/affiliates`,
+      url: `${this.endpoint}/users/${sellerId}/affiliates`,
       headers,
     }));
     return { affiliates };
