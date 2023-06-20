@@ -486,7 +486,10 @@ class Plugin {
       url: `${this.endpoint}/users/${sellerId}/affiliates`,
       headers,
     }));
-    return { affiliates };
+    return { affiliates: affiliates.map(affiliate => ({
+      affiliateId: affiliate.id,
+      affiliateCode: affiliate.code,
+    })) };
   }
 }
 
