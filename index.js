@@ -489,6 +489,7 @@ class Plugin {
     return { affiliates: affiliates.map(affiliate => ({
       affiliateId: affiliate.id,
       affiliateCode: affiliate.code,
+      name: affiliate.name || affiliate.code, // name is required
     })) };
   }
 }
