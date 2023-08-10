@@ -500,7 +500,7 @@ class Plugin {
     });
     const affiliates = await R.path(['data'], await axios({
       method: 'get',
-      url: `${this.endpoint}/users/${sellerId}/affiliates`,
+      url: `${endpoint || this.endpoint}/users/${sellerId}/affiliates`,
       headers,
     }));
     return { affiliates: affiliates.map(affiliate => ({
