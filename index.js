@@ -68,12 +68,13 @@ class Plugin {
     token: {
       sellerId,
       endpoint,
+      apiKey,
     },
   }) {
     assert(this.apiKey, 'apiKey should be set');
     const url = `${endpoint || this.endpoint}/experiences?seller=${sellerId}`;
     const headers = getHeaders({
-      apiKey: this.apiKey,
+      apiKey: apiKey || this.apiKey,
     });
     try {
       const products = R.path(['data', 'data'], await axios({
@@ -93,6 +94,7 @@ class Plugin {
     token: {
       sellerId,
       endpoint,
+      apiKey,
     },
     payload,
     typeDefsAndQueries: {
@@ -104,7 +106,7 @@ class Plugin {
     assert(this.apiKey, 'apiKey should be set');
     let url = `${endpoint || this.endpoint}/experiences?seller=${sellerId}`;
     const headers = getHeaders({
-      apiKey: this.apiKey,
+      apiKey: apiKey || this.apiKey,
     });
     let results = R.pathOr([], ['data', 'data'], await axios({
       method: 'get',
@@ -155,6 +157,7 @@ class Plugin {
       sellerId,
       affiliateCode,
       endpoint,
+      apiKey,
     },
     payload: {
       productIds,
@@ -185,7 +188,7 @@ class Plugin {
     const localDateStart = moment(startDate, dateFormat).format('YYYY-MM-DD');
     const localDateEnd = moment(endDate, dateFormat).format('YYYY-MM-DD');
     const headers = getHeaders({
-      apiKey: this.apiKey,
+      apiKey: apiKey || this.apiKey,
     });
     const url = `${endpoint || this.endpoint}`;
     let availability = (
@@ -282,6 +285,7 @@ class Plugin {
       affiliateCode,
       affiliateId,
       endpoint,
+      apiKey,
     },
     payload: {
       availabilityKey,
@@ -300,7 +304,7 @@ class Plugin {
     assert(R.path(['name'], holder), 'a holder\' first name is required');
     assert(R.path(['surname'], holder), 'a holder\' surname is required');
     const headers = getHeaders({
-      apiKey: this.apiKey,
+      apiKey: apiKey || this.apiKey,
     });
     const urlForCreateBooking = `${endpoint || this.endpoint}/orders`;
     const dataFromAvailKey = await jwt.verify(availabilityKey, this.jwtKey);
@@ -360,6 +364,7 @@ class Plugin {
     token: {
       sellerId,
       endpoint,
+      apiKey,
     },
     payload: {
       bookingId,
@@ -374,7 +379,7 @@ class Plugin {
     assert(this.apiKey, 'apiKey should be set');
     assert(!isNilOrEmpty(bookingId) || !isNilOrEmpty(id), 'Invalid booking id');
     const headers = getHeaders({
-      apiKey: this.apiKey,
+      apiKey: apiKey || this.apiKey,
     });
     // let booking = R.path(['data'], await axios({
     //   method: 'get',
@@ -409,6 +414,7 @@ class Plugin {
     token: {
       sellerId,
       endpoint,
+      apiKey,
     },
     payload: {
       bookingId,
@@ -433,7 +439,7 @@ class Plugin {
       'at least one parameter is required',
     );
     const headers = getHeaders({
-      apiKey: this.apiKey,
+      apiKey: apiKey || this.apiKey,
     });
     const bookings = await (async () => {
       if (bookingId) {
@@ -484,12 +490,13 @@ class Plugin {
     token: {
       sellerId,
       endpoint,
+      apiKey,
     },
   }) {
     assert(this.apiKey, 'apiKey should be set');
     assert(sellerId, 'sellerId should be set');
     const headers = getHeaders({
-      apiKey: this.apiKey,
+      apiKey: apiKey || this.apiKey,
     });
     const affiliates = await R.path(['data'], await axios({
       method: 'get',
